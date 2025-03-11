@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathology Learning Tool</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.5;
+      color: #333;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background-color: #f0f8ff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    h1 {
+      color: #2c5282;
+      margin: 0;
+    }
+    .case {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .case-title {
+      font-size: 1.4em;
+      color: #2c5282;
+      margin-top: 0;
+    }
+    .elements {
+      margin-top: 20px;
+    }
+    .element {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .element-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .element-title {
+      font-weight: bold;
+      margin: 0;
+    }
+    .element-type {
+      font-size: 0.9em;
+      margin-top: 5px;
+      color: #555;
+    }
+    .element-explanation, .element-clinical {
+      background-color: rgba(255,255,255,0.7);
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    .hidden {
+      display: none;
+    }
+    .btn {
+      background-color: #4299e1;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 0.8em;
+    }
+    .btn:hover {
+      background-color: #3182ce;
+    }
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom-color: #4299e1;
+      color: #2c5282;
+      font-weight: bold;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .sequence-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .sequence-item {
+      background-color: #e2e8f0;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .sequence-order {
+      margin-top: 20px;
+      min-height: 100px;
+      border: 1px dashed #cbd5e0;
+      border-radius: 4px;
+      padding: 15px;
+    }
+    .ordered-item {
+      background-color: #edf2f7;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ordered-num {
+      background-color: #4299e1;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    .type-genetic { background-color: #ffcccc; }
+    .type-protein { background-color: #ffe0cc; }
+    .type-cellular { background-color: #ffffcc; }
+    .type-tissue { background-color: #e6ffcc; }
+    .type-organ { background-color: #ccffcc; }
+    .type-symptom { background-color: #ccffe0; }
+    .type-physical { background-color: #ccffff; }
+    .instructions {
+      background-color: #ebf8ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pathology Learning Tool</h1>
+    <p>Understanding disease from changes to clinical presentation</p>
+  </header>
+
+  <div class="case">
+    <h2 class="case-title">The Changing Mole</h2>
+    <p>A 52-year-old patient has noticed a mole on their back has changed over the past 6 months. It's darker, larger, and has irregular borders.</p>
+    
+    <div class="tab-nav">
+      <div class="tab active" data-tab="identify">1. Identify Elements</div>
+      <div class="tab" data-tab="connect">2. Connect to Practice</div>
+      <div class="tab" data-tab="sequence">3. Disease Sequence</div>
+    </div>
+    
+    <div class="tab-content active" id="identify">
+      <div class="instructions">
+        <p>For each finding below, identify what type of change or observation it represents.</p>
+      </div>
+      
+      <div class="elements">
+        <div class="element" id="element-1">
+          <div class="element-header">
+            <p class="element-title">DNA damage from UV radiation</p>
+            <button class="btn-small btn" onclick="toggleExplanation('explanation-1')">?</button>
+          </div>
+          <div class="element-explanation hidden" id="explanation-1">
+            Ultraviolet light causes mutations in genes that control melanocyte growth
+          </div>
+          <div class="element-type" id="type-1">
+            <p>Select type:</p>
+            <select onchange="selectType(this, 'genetic', 1)">
+              <option value="">-- Select --</option>
+              <option value="genetic">Genetic Changes</option>
+              <option value="protein">Protein Changes</option>
+              <option value="cellular">Cell Changes</option>
+              <option value="tissue">Tissue Changes</option>
+              <option value="organ">Organ Effects</option>
+              <option value="symptom">Symptoms</option>
+              <option value="physical">Physical Signs</option>
+            </select>
+            <div id="feedback-1" class="hidden"></div>
+          </div>
+        </div>
+        
+        <div class="element" id="element-2">
+          <div class="element-header">
+            <p class="element-title">Abnormal melanocytes multiplying rapidly</p>
+            <button class="btn-small btn" onclick="toggleExplanation('explanation-2')">?</button>
+          </div>
+          <div class="element-explanation hidden" id="explanation-2">
+            Damaged cells divide without normal control mechanisms
+          </div>
+          <div class="element-type" id="type-2">
+            <p>Select type:</p>
+            <select onchange="selectType(this, 'cellular', 2)">
+              <option value="">-- Select --</option>
+              <option value="genetic">Genetic Changes</option>
+              <option value="protein">Protein Changes</option>
+              <option value="cellular">Cell Changes</option>
+              <option value="tissue">Tissue Changes</option>
+              <option value="organ">Organ Effects</option>
+              <option value="symptom">Symptoms</option>
+              <option value="physical">Physical Signs</option>
+            </select>
+            <div id="feedback-2" class="hidden"></div>
+          </div>
+        </div>
+        
+        <div class="element" id="element-3">
+          <div class="element-header">
+            <p class="element-title">Irregular border and color changes in the mole</p>
+            <button class="btn-small btn" onclick="toggleExplanation('explanation-3')">?</button>
+          </div>
+          <div class="element-explanation hidden" id="explanation-3">
+            Visual changes reflecting abnormal cell growth patterns
+          </div>
+          <div class="element-type" id="type-3">
+            <p>Select type:</p>
+            <select onchange="selectType(this, 'physical', 3)">
+              <option value="">-- Select --</option>
+              <option value="genetic">Genetic Changes</option>
+              <option value="protein">Protein Changes</option>
+              <option value="cellular">Cell Changes</option>
+              <option value="tissue">Tissue Changes</option>
+              <option value="organ">Organ Effects</option>
+              <option value="symptom">Symptoms</option>
+              <option value="physical">Physical Signs</option>
+            </select>
+            <div id="feedback-3" class="hidden"></div>
+          </div>
+        </div>
+        
+        <div class="element" id="element-4">
+          <div class="element-header">
+            <p class="element-title">Invasion of melanoma cells into deeper skin layers</p>
+            <button class="btn-small btn" onclick="toggleExplanation('explanation-4')">?</button>
+          </div>
+          <div class="element-explanation hidden" id="explanation-4">
+            Cancerous cells breaking through tissue barriers
+          </div>
+          <div class="element-type" id="type-4">
+            <p>Select type:</p>
+            <select onchange="selectType(this, 'tissue', 4)">
+              <option value="">-- Select --</option>
+              <option value="genetic">Genetic Changes</option>
+              <option value="protein">Protein Changes</option>
+              <option value="cellular">Cell Changes</option>
+              <option value="tissue">Tissue Changes</option>
+              <option value="organ">Organ Effects</option>
+              <option value="symptom">Symptoms</option>
+              <option value="physical">Physical Signs</option>
+            </select>
+            <div id="feedback-4" class="hidden"></div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="btn" style="margin-top: 20px;" onclick="checkAnswers()">Check Answers</button>
+      <div id="results" class="hidden" style="margin-top: 15px;"></div>
+    </div>
+    
+    <div class="tab-content" id="connect">
+      <div class="instructions">
+        <p>Now learn how each pathological finding connects to clinical practice. Click each card to see its clinical implications.</p>
+      </div>
+      
+      <div class="elements">
+        <div class="element type-genetic">
+          <div class="element-header">
+            <div>
+              <p class="element-title">DNA damage from UV radiation</p>
+              <p class="element-type">Genetic Changes: Ultraviolet light causes mutations in genes that control melanocyte growth</p>
+            </div>
+            <button class="btn-small btn" onclick="toggleClinical('clinical-1')">Show Clinical</button>
+          </div>
+          <div class="element-clinical hidden" id="clinical-1">
+            <strong>Clinical Application:</strong> Ask about sun exposure history and family history of skin cancer
+          </div>
+        </div>
+        
+        <div class="element type-cellular">
+          <div class="element-header">
+            <div>
+              <p class="element-title">Abnormal melanocytes multiplying rapidly</p>
+              <p class="element-type">Cell Changes: Damaged cells divide without normal control mechanisms</p>
+            </div>
+            <button class="btn-small btn" onclick="toggleClinical('clinical-2')">Show Clinical</button>
+          </div>
+          <div class="element-clinical hidden" id="clinical-2">
+            <strong>Clinical Application:</strong> Examine all skin surfaces for other suspicious lesions
+          </div>
+        </div>
+        
+        <div class="element type-physical">
+          <div class="element-header">
+            <div>
+              <p class="element-title">Irregular border and color changes in the mole</p>
+              <p class="element-type">Physical Signs: Visual changes reflecting abnormal cell growth patterns</p>
+            </div>
+            <button class="btn-small btn" onclick="toggleClinical('clinical-3')">Show Clinical</button>
+          </div>
+          <div class="element-clinical hidden" id="clinical-3">
+            <strong>Clinical Application:</strong> Document changes using the ABCDE criteria (Asymmetry, Border, Color, Diameter, Evolution)
+          </div>
+        </div>
+        
+        <div class="element type-tissue">
+          <div class="element-header">
+            <div>
+              <p class="element-title">Invasion of melanoma cells into deeper skin layers</p>
+              <p class="element-type">Tissue Changes: Cancerous cells breaking through tissue barriers</p>
+            </div>
+            <button class="btn-small btn" onclick="toggleClinical('clinical-4')">Show Clinical</button>
+          </div>
+          <div class="element-clinical hidden" id="clinical-4">
+            <strong>Clinical Application:</strong> Biopsy needed to determine invasion depth (Breslow thickness)
+          </div>
+        </div>
+      </div>
+      
+      <button class="btn" style="margin-top: 20px;" onclick="nextTab()">Continue</button>
+    </div>
+    
+    <div class="tab-content" id="sequence">
+      <div class="instructions">
+        <p>Arrange these elements in the order they typically occur in disease development, from earliest to latest.</p>
+      </div>
+      
+      <div class="sequence-container">
+        <div class="sequence-item type-tissue" data-id="4" onclick="addToSequence(4)">
+          Invasion of melanoma cells into deeper skin layers
+        </div>
+        <div class="sequence-item type-cellular" data-id="2" onclick="addToSequence(2)">
+          Abnormal melanocytes multiplying rapidly
+        </div>
+        <div class="sequence-item type-physical" data-id="3" onclick="addToSequence(3)">
+          Irregular border and color changes in the mole
+        </div>
+        <div class="sequence-item type-genetic" data-id="1" onclick="addToSequence(1)">
+          DNA damage from UV radiation
+        </div>
+      </div>
+      
+      <h3>Your Sequence (First → Last)</h3>
+      <div class="sequence-order" id="sequence-order">
+        <p id="empty-sequence">Click elements above to add them to your sequence</p>
+      </div>
+      
+      <button class="btn" style="margin-top: 20px;" onclick="checkSequence()">Check Sequence</button>
+      <div id="sequence-results" class="hidden" style="margin-top: 15px;"></div>
+    </div>
+  </div>
+  
+  <script>
+    // Global variables
+    let selectedAnswers = {};
+    let sequence = [];
+    
+    // Toggle explanation visibility
+    function toggleExplanation(id) {
+      const element = document.getElementById(id);
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+      } else {
+        element.classList.add('hidden');
+      }
+    }
+    
+    // Toggle clinical information visibility
+    function toggleClinical(id) {
+      const element = document.getElementById(id);
+      const button = event.target;
+      
+      if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+        button.textContent = 'Hide Clinical';
+      } else {
+        element.classList.add('hidden');
+        button.textContent = 'Show Clinical';
+      }
+    }
+    
+    // Handle tab switching
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show selected tab content
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Handle type selection
+    function selectType(selectElement, correctType, id) {
+      const selectedType = selectElement.value;
+      selectedAnswers[id] = selectedType;
+      
+      // Change background color of element based on selection
+      const element = document.getElementById(`element-${id}`);
+      element.className = 'element';
+      if (selectedType) {
+        element.classList.add(`type-${selectedType}`);
+      }
+    }
+    
+    // Check answers in Identify tab
+    function checkAnswers() {
+      let correct = 0;
+      const total = 4; // Number of questions
+      
+      // Define correct answers
+      const correctAnswers = {
+        1: 'genetic',
+        2: 'cellular',
+        3: 'physical',
+        4: 'tissue'
+      };
+      
+      // Check each answer
+      for (let i = 1; i <= total; i++) {
+        const feedbackElement = document.getElementById(`feedback-${i}`);
+        feedbackElement.classList.remove('hidden');
+        
+        if (selectedAnswers[i] === correctAnswers[i]) {
+          feedbackElement.innerHTML = '✓ Correct!';
+          feedbackElement.style.color = 'green';
+          correct++;
+        } else {
+          feedbackElement.innerHTML = `✗ Incorrect. This is a ${correctAnswers[i]} change.`;
+          feedbackElement.style.color = 'red';
+        }
+      }
+      
+      // Display overall results
+      const resultsElement = document.getElementById('results');
+      resultsElement.classList.remove('hidden');
+      resultsElement.innerHTML = `You got ${correct} out of ${total} correct (${Math.round((correct/total)*100)}%)`;
+      
+      // Add next button
+      if (!document.getElementById('next-button')) {
+        const nextButton = document.createElement('button');
+        nextButton.className = 'btn';
+        nextButton.textContent = 'Next Level';
+        nextButton.id = 'next-button';
+        nextButton.style.marginLeft = '10px';
+        nextButton.onclick = nextTab;
+        resultsElement.appendChild(nextButton);
+      }
+    }
+    
+    // Move to next tab
+    function nextTab() {
+      let activeTab = document.querySelector('.tab.active');
+      let nextTab = activeTab.nextElementSibling;
+      
+      if (nextTab) {
+        activeTab.classList.remove('active');
+        nextTab.classList.add('active');
+        
+        // Update tab content
+        const currentContentId = activeTab.getAttribute('data-tab');
+        const nextContentId = nextTab.getAttribute('data-tab');
+        
+        document.getElementById(currentContentId).classList.remove('active');
+        document.getElementById(nextContentId).classList.add('active');
+      }
+    }
+    
+    // Handle sequence creation
+    function addToSequence(id) {
+      // Don't add if already in sequence
+      if (sequence.includes(id)) return;
+      
+      sequence.push(id);
+      updateSequenceDisplay();
+      
+      // Hide the item from the available items
+      const item = event.target;
+      item.style.display = 'none';
+    }
+    
+    // Remove from sequence
+    function removeFromSequence(id) {
+      const index = sequence.indexOf(id);
+      if (index !== -1) {
+        sequence.splice(index, 1);
+      }
+      updateSequenceDisplay();
+      
+      // Show the item in available items
+      document.querySelectorAll(`.sequence-item[data-id="${id}"]`).forEach(item => {
+        item.style.display = 'block';
+      });
+    }
+    
+    // Update sequence display
+    function updateSequenceDisplay() {
+      const container = document.getElementById('sequence-order');
+      const emptyMessage = document.getElementById('empty-sequence');
+      
+      if (sequence.length === 0) {
+        emptyMessage.style.display = 'block';
+        container.innerHTML = '<p id="empty-sequence">Click elements above to add them to your sequence</p>';
+        return;
+      }
+      
+      emptyMessage.style.display = 'none';
+      
+      // Clear container
+      container.innerHTML = '';
+      
+      // Add each item in sequence
+      sequence.forEach((id, index) => {
+        const originalItem = document.querySelector(`.sequence-item[data-id="${id}"]`);
+        const className = originalItem.className.replace('sequence-item', 'ordered-item');
+        
+        const item = document.createElement('div');
+        item.className = className;
+        item.innerHTML = `
+          <div style="display: flex; align-items: center;">
+            <span class="ordered-num">${index + 1}</span>
+            ${originalItem.textContent}
+          </div>
+          <button onclick="removeFromSequence(${id})">Remove</button>
+        `;
+        
+        container.appendChild(item);
+      });
+    }
+    
+    // Check sequence
+    function checkSequence() {
+      const correctSequence = [1, 2, 3, 4]; // Correct order of IDs
+      const results = document.getElementById('sequence-results');
+      results.classList.remove('hidden');
+      
+      if (sequence.length < 4) {
+        results.innerHTML = 'Please arrange all elements in sequence before checking.';
+        return;
+      }
+      
+      // Check if sequence matches correct order
+      let correct = 0;
+      for (let i = 0; i < sequence.length; i++) {
+        if (sequence[i] === correctSequence[i]) {
+          correct++;
+        }
+      }
+      
+      const percentage = Math.round((correct / 4) * 100);
+      
+      if (percentage === 100) {
+        results.innerHTML = 'Perfect! Your sequence is correct. This shows a complete understanding of disease progression.';
+      } else if (percentage >= 75) {
+        results.innerHTML = 'Very good! Your sequence is mostly correct.';
+      } else if (percentage >= 50) {
+        results.innerHTML = 'Good attempt! About half of your sequence is in the right order.';
+      } else {
+        results.innerHTML = 'Keep trying! The typical progression starts with genetic changes, then cellular changes, visible signs, and finally tissue invasion.';
+      }
+      
+      // Add next button
+      if (!document.getElementById('next-case-button')) {
+        const nextButton = document.createElement('button');
+        nextButton.className = 'btn';
+        nextButton.textContent = 'Go to Next Case';
+        nextButton.id = 'next-case-button';
+        nextButton.style.marginLeft = '10px';
+        nextButton.onclick = resetCase;
+        results.appendChild(nextButton);
+      }
+    }
+    
+    // Reset case (would normally go to next case)
+    function resetCase() {
+      // Reset all answers and sequences
+      selectedAnswers = {};
+      sequence = [];
+      
+      // Reset UI
+      document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+      });
+      
+      document.querySelectorAll('.element').forEach(element => {
+        element.className = 'element';
+      });
+      
+      document.querySelectorAll('.feedback').forEach(feedback => {
+        feedback.classList.add('hidden');
+      });
+      
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('sequence-results').classList.add('hidden');
+      
+      // Show all sequence items
+      document.querySelectorAll('.sequence-item').forEach(item => {
+        item.style.display = 'block';
+      });
+      
+      updateSequenceDisplay();
+      
+      // Go back to first tab
+      document.querySelectorAll('.tab').forEach((tab, index) => {
+        if (index === 0) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      
+      document.querySelectorAll('.tab-content').forEach((content, index) => {
+        if (index === 0) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+      
+      alert('In a full version, this would take you to the next case. This demo just resets the current case.');
+    }
+  </script>
+</body>
+</html>
