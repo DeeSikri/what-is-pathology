@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pathology Learning Tool</title>
+  
+  <!-- React and dependencies -->
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    // Create icon components from Lucide
+    const { ArrowRight, Check, X, HelpCircle, ChevronRight, ChevronDown } = lucide;
+    
+    const PathologyLearningTool = () => {
+      // Sample cases with different pathological elements
+      const cases = [
+        {
+          id: 1,
+          title: "The Changing Mole",
+          description: "A 52-year-old patient has noticed a mole on their back has changed over the past 6 months. It's darker, larger, and has irregular borders.",
+          elements: [
+            {
+              id: "mole1",
+              text: "DNA damage from UV radiation",
+              type: "genetic",
+              explanation: "Ultraviolet light causes mutations in genes that control melanocyte growth",
+              clinicalImplication: "Ask about sun exposure history and family history of skin cancer"
+            },
+            {
+              id: "mole2",
+              text: "Abnormal melanocytes multiplying rapidly",
+              type: "cellular",
+              explanation: "Damaged cells divide without normal control mechanisms",
+              clinicalImplication: "Examine all skin surfaces for other suspicious lesions"
+            },
+            {
+              id: "mole3",
+              text: "Irregular border and color changes in the mole",
+              type: "physical",
+              explanation: "Visual changes reflecting abnormal cell growth patterns",
+              clinicalImplication: "Document changes using the ABCDE criteria (Asymmetry, Border, Color, Diameter, Evolution)"
+            },
+            {
+              id: "mole4",
+              text: "Invasion of melanoma cells into deeper skin layers",
+              type: "tissue",
+              explanation: "Cancerous cells breaking through tissue barriers",
+              clinicalImplication: "Biopsy needed to determine invasion depth (Breslow thickness)"
+            }
+          ]
+        },
+        {
+          id: 2,
+          title: "The Persistent Cough",
+          description: "A 63-year-old smoker comes in with a cough that has persisted for 3 months. They've also lost weight and noticed blood in their sputum.",
+          elements: [
+            {
+              id: "cough1",
+              text: "Repeated exposure to cigarette smoke carcinogens",
+              type: "genetic",
+              explanation: "Chemicals in smoke damage DNA in lung cells over time",
+              clinicalImplication: "Calculate pack-years and discuss smoking cessation"
+            },
+            {
+              id: "cough2",
+              text: "Mutations in tumor suppressor genes",
+              type: "genetic",
+              explanation: "Key genes that prevent cancer development become damaged",
+              clinicalImplication: "Family history may reveal inherited cancer susceptibility"
+            },
+            {
+              id: "cough3",
+              text: "Bronchial epithelial cells becoming abnormal",
+              type: "cellular",
+              explanation: "Cells change shape and growth patterns (dysplasia)",
+              clinicalImplication: "Sputum cytology may show abnormal cells"
+            },
+            {
+              id: "cough4",
+              text: "Mass forming in lung tissue",
+              type: "organ",
+              explanation: "Abnormal cells form a tumor that displaces normal lung",
+              clinicalImplication: "Order chest X-ray or CT scan to visualize the mass"
+            },
+            {
+              id: "cough5",
+              text: "Hemoptysis (blood in sputum)",
+              type: "symptom",
+              explanation: "Tumor erodes into blood vessels causing bleeding",
+              clinicalImplication: "Urgency of workup increases with this red flag symptom"
+            }
+          ]
+        },
+        {
+          id: 3,
+          title: "The Simple Bruise",
+          description: "An 8-year-old boy has a large bruise on his knee after a minor fall during play. His mother mentions he seems to bruise easily.",
+          elements: [
+            {
+              id: "bruise1",
+              text: "Possible mutation in clotting factor genes",
+              type: "genetic",
+              explanation: "Some bleeding disorders are caused by inherited gene mutations",
+              clinicalImplication: "Take detailed family history of bleeding problems"
+            },
+            {
+              id: "bruise2",
+              text: "Blood vessels rupture under the skin",
+              type: "tissue",
+              explanation: "Physical trauma damages small vessels, letting blood leak into surrounding tissue",
+              clinicalImplication: "Examine for bruising in unusual locations or without trauma"
+            },
+            {
+              id: "bruise3",
+              text: "Red to purple to green to yellow color changes",
+              type: "physical",
+              explanation: "Colors reflect breakdown of hemoglobin over time",
+              clinicalImplication: "Age of bruises can sometimes be estimated by color"
+            },
+            {
+              id: "bruise4",
+              text: "Prolonged bleeding after minor injuries",
+              type: "symptom",
+              explanation: "Poor clot formation leads to extended bleeding time",
+              clinicalImplication: "Perform coagulation tests (PT, PTT, platelet count)"
+            }
+          ]
+        },
+        {
+          id: 4,
+          title: "The Unexplained Fatigue",
+          description: "A 45-year-old woman reports increasing fatigue, joint pain, and a butterfly-shaped rash across her cheeks.",
+          elements: [
+            {
+              id: "fatigue1",
+              text: "Genetic predisposition to autoimmunity",
+              type: "genetic",
+              explanation: "Multiple genes influence immune system regulation",
+              clinicalImplication: "Ask about family history of autoimmune conditions"
+            },
+            {
+              id: "fatigue2",
+              text: "Production of autoantibodies",
+              type: "protein",
+              explanation: "Immune system creates antibodies that target the body's own tissues",
+              clinicalImplication: "Order ANA, anti-dsDNA, and other antibody tests"
+            },
+            {
+              id: "fatigue3",
+              text: "Immune complexes depositing in tissues",
+              type: "cellular",
+              explanation: "Antibody-antigen complexes trigger inflammation when they accumulate",
+              clinicalImplication: "Check for signs of organ damage with liver/kidney function tests"
+            },
+            {
+              id: "fatigue4",
+              text: "Inflammation in multiple organ systems",
+              type: "organ",
+              explanation: "Widespread inflammation affects joints, skin, kidneys and other organs",
+              clinicalImplication: "Examine all major organ systems for involvement"
+            },
+            {
+              id: "fatigue5",
+              text: "Butterfly (malar) rash on face",
+              type: "physical",
+              explanation: "Characteristic rash across cheeks and nose in lupus",
+              clinicalImplication: "Document rash with photos and note if it worsens with sun exposure"
+            }
+          ]
+        }
+      ];
+
+      // Learning levels
+      const levels = [
+        { id: "identify", name: "Identify Elements", description: "Categorize each finding by type" },
+        { id: "connect", name: "Connect to Practice", description: "Link findings to clinical decisions" },
+        { id: "sequence", name: "Disease Sequence", description: "Arrange events in disease progression" }
+      ];
+
+      // Element types with descriptions
+      const elementTypes = [
+        { 
+          type: "genetic", 
+          label: "Genetic Changes", 
+          description: "Changes in DNA that affect how cells work",
+          color: "#ffcccc" 
+        },
+        { 
+          type: "protein", 
+          label: "Protein Changes", 
+          description: "Abnormal proteins made from changed DNA",
+          color: "#ffe0cc" 
+        },
+        { 
+          type: "cellular", 
+          label: "Cell Changes", 
+          description: "How cells look or behave differently",
+          color: "#ffffcc" 
+        },
+        { 
+          type: "tissue", 
+          label: "Tissue Changes", 
+          description: "Changes in groups of cells working together",
+          color: "#e6ffcc" 
+        },
+        { 
+          type: "organ", 
+          label: "Organ Effects", 
+          description: "How the disease affects whole organs",
+          color: "#ccffcc" 
+        },
+        { 
+          type: "symptom", 
+          label: "Symptoms", 
+          description: "What the patient feels or experiences",
+          color: "#ccffe0" 
+        },
+        { 
+          type: "physical", 
+          label: "Physical Signs", 
+          description: "What the doctor can observe or measure",
+          color: "#ccffff" 
+        }
+      ];
+
+      // State variables
+      const [currentCase, setCurrentCase] = React.useState(cases[0]);
+      const [currentLevel, setCurrentLevel] = React.useState(levels[0]);
+      const [answers, setAnswers] = React.useState({});
+      const [userSequence, setUserSequence] = React.useState([]);
+      const [showExplanation, setShowExplanation] = React.useState({});
+      const [showFeedback, setShowFeedback] = React.useState(false);
+      const [score, setScore] = React.useState(0);
+      const [showInstructions, setShowInstructions] = React.useState(true);
+      const [shuffledElements, setShuffledElements] = React.useState([]);
+
+      // Initialize answers when case or level changes
+      React.useEffect(() => {
+        setAnswers({});
+        setUserSequence([]);
+        setShowExplanation({});
+        setShowFeedback(false);
+      }, [currentCase, currentLevel]);
+
+      // Function to shuffle an array
+      const shuffleArray = (array) => {
+        // Create a copy to avoid modifying the original
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
+      
+      // Shuffle elements when case changes
+      React.useEffect(() => {
+        setShuffledElements(shuffleArray(currentCase.elements));
+      }, [currentCase]);
+
+      // Handle answer selection for identification level
+      const handleIdentifyAnswer = (elementId, selectedType) => {
+        setAnswers({
+          ...answers,
+          [elementId]: selectedType
+        });
+      };
+
+      // Toggle explanation visibility
+      const toggleExplanation = (elementId) => {
+        setShowExplanation({
+          ...showExplanation,
+          [elementId]: !showExplanation[elementId]
+        });
+      };
+
+      // Add element to sequence
+      const addToSequence = (elementId) => {
+        if (!userSequence.includes(elementId)) {
+          setUserSequence([...userSequence, elementId]);
+        }
+      };
+
+      // Remove element from sequence
+      const removeFromSequence = (elementId) => {
+        setUserSequence(userSequence.filter(id => id !== elementId));
+      };
+
+      // Check answers and show feedback
+      const checkAnswers = () => {
+        let correct = 0;
+        let total = 0;
+
+        if (currentLevel.id === "identify") {
+          total = currentCase.elements.length;
+          currentCase.elements.forEach(element => {
+            if (answers[element.id] === element.type) {
+              correct++;
+            }
+          });
+        } else if (currentLevel.id === "connect") {
+          // This level is more about learning than scoring
+          total = Object.keys(answers).length;
+          correct = total; // Auto-correct for this learning level
+        } else if (currentLevel.id === "sequence") {
+          // Simple scoring for sequence - this could be enhanced
+          total = currentCase.elements.length;
+          correct = total / 2; // Partial credit by default
+        }
+
+        setScore(Math.round((correct / total) * 100));
+        setShowFeedback(true);
+      };
+
+      // Reset current level
+      const resetLevel = () => {
+        setAnswers({});
+        setUserSequence([]);
+        setShowExplanation({});
+        setShowFeedback(false);
+      };
+
+      // Go to next case
+      const nextCase = () => {
+        const currentIndex = cases.findIndex(c => c.id === currentCase.id);
+        if (currentIndex < cases.length - 1) {
+          setCurrentCase(cases[currentIndex + 1]);
+        } else {
+          setCurrentCase(cases[0]); // Loop back to first case
+        }
+        setShowFeedback(false);
+      };
+
+      // Go to next level
+      const nextLevel = () => {
+        const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
+        if (currentIndex < levels.length - 1) {
+          setCurrentLevel(levels[currentIndex + 1]);
+        } else {
+          // Move to next case and reset to first level
+          nextCase();
+          setCurrentLevel(levels[0]);
+        }
+      };
+
+      // Render the identification level
+      const renderIdentifyLevel = () => {
+        return (
+          <div className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <p className="text-blue-800">
+                For each finding below, identify what type of change or observation it represents.
+              </p>
+            </div>
+            
+            {currentCase.elements.map(element => (
+              <div 
+                key={element.id} 
+                className={`p-4 rounded-lg border ${answers[element.id] ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}
+              >
+                <div className="flex justify-between items-start">
+                  <p className="font-medium">{element.text}</p>
+                  <button 
+                    onClick={() => toggleExplanation(element.id)}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    <HelpCircle size={18} />
+                  </button>
+                </div>
+                
+                {showExplanation[element.id] && (
+                  <div className="mt-2 p-2 bg-gray-100 rounded text-sm">
+                    {element.explanation}
+                  </div>
+                )}
+                
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {elementTypes.map(type => (
+                    <button
+                      key={`${element.id}-${type.type}`}
+                      className={`py-1 px-2 text-sm rounded text-left ${
+                        answers[element.id] === type.type 
+                          ? 'bg-blue-500 text-white' 
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                      }`}
+                      style={{ backgroundColor: answers[element.id] === type.type ? '#3b82f6' : type.color }}
+                      onClick={() => handleIdentifyAnswer(element.id, type.type)}
+                    >
+                      {type.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      };
+
+      // Render the connection level
+      const renderConnectLevel = () => {
+        return (
+          <div className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <p className="text-blue-800">
+                Now learn how each pathological finding connects to clinical practice. Click each card to see its clinical implications.
+              </p>
+            </div>
+            
+            {currentCase.elements.map(element => {
+              const elementType = elementTypes.find(type => type.type === element.type);
+              
+              return (
+                <div 
+                  key={element.id} 
+                  className="p-4 rounded-lg border border-gray-200"
+                  style={{ backgroundColor: elementType ? elementType.color : '#f9fafb' }}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{element.text}</p>
+                      <p className="text-sm text-gray-600 mt-1">{elementType?.label}: {element.explanation}</p>
+                    </div>
+                    <button 
+                      onClick={() => toggleExplanation(element.id)}
+                      className={`${showExplanation[element.id] ? 'text-blue-700' : 'text-blue-500 hover:text-blue-700'}`}
+                    >
+                      {showExplanation[element.id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                    </button>
+                  </div>
+                  
+                  {showExplanation[element.id] && (
+                    <div className="mt-3 p-3 bg-white rounded-lg shadow-sm border border-blue-100">
+                      <p className="text-sm font-medium text-blue-800">Clinical Application:</p>
+                      <p className="text-sm mt-1">{element.clinicalImplication}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      };
+
+      // Render the sequencing level
+      const renderSequenceLevel = () => {
+        return (
+          <div className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+              <p className="text-blue-800">
+                Arrange these elements in the order they typically occur in disease development, from earliest to latest.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Available elements (shuffled) */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium mb-3">Available Elements</h3>
+                <div className="space-y-2">
+                  {shuffledElements.map(element => {
+                    if (userSequence.includes(element.id)) return null;
+                    
+                    const elementType = elementTypes.find(type => type.type === element.type);
+                    
+                    return (
+                      <div 
+                        key={element.id}
+                        className="p-2 rounded-lg border border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+                        style={{ backgroundColor: elementType ? elementType.color : '#f9fafb' }}
+                        onClick={() => addToSequence(element.id)}
+                      >
+                        <span>{element.text}</span>
+                        <ArrowRight size={16} className="text-gray-500" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Sequence */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium mb-3">Your Sequence (First → Last)</h3>
+                {userSequence.length === 0 ? (
+                  <p className="text-gray-500 italic text-sm">Click elements on the left to add them to your sequence</p>
+                ) : (
+                  <div className="space-y-2">
+                    {userSequence.map((elementId, index) => {
+                      const element = currentCase.elements.find(e => e.id === elementId);
+                      const elementType = elementTypes.find(type => type.type === element.type);
+                      
+                      return (
+                        <div 
+                          key={`sequence-${elementId}`}
+                          className="p-2 rounded-lg border border-gray-200 flex items-center hover:bg-gray-50"
+                          style={{ backgroundColor: elementType ? elementType.color : '#f9fafb' }}
+                        >
+                          <span className="bg-gray-200 text-gray-800 rounded-full w-6 h-6 flex items-center justify-center mr-2">
+                            {index + 1}
+                          </span>
+                          <span className="flex-1">{element.text}</span>
+                          <button 
+                            onClick={() => removeFromSequence(elementId)}
+                            className="text-gray-400 hover:text-red-500"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // Render feedback
+      const renderFeedback = () => {
+        return (
+          <div className="mt-8 p-6 bg-blue-50 rounded-lg">
+            <h3 className="font-medium text-xl mb-2">Your Progress</h3>
+            
+            {currentLevel.id === "identify" && (
+              <div>
+                <p className="mb-3">You correctly identified {score}% of the elements.</p>
+                <div className="space-y-3">
+                  {currentCase.elements.map(element => {
+                    const isCorrect = answers[element.id] === element.type;
+                    const elementType = elementTypes.find(type => type.type === element.type);
+                    
+                    return (
+                      <div 
+                        key={`feedback-${element.id}`}
+                        className={`p-3 rounded-lg ${isCorrect ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'} border`}
+                      >
+                        <div className="flex items-start">
+                          <div className={`rounded-full w-6 h-6 flex items-center justify-center mr-2 ${isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
+                            {isCorrect ? <Check size={14} /> : <X size={14} />}
+                          </div>
+                          <div>
+                            <p className="font-medium">{element.text}</p>
+                            <p className="text-sm mt-1">
+                              Correct type: <span className="font-medium">{elementType?.label}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
+            {currentLevel.id === "connect" && (
+              <div>
+                <p>Great job exploring the clinical connections! These relationships are what make pathology so important for clinical practice.</p>
+              </div>
+            )}
+            
+            {currentLevel.id === "sequence" && (
+              <div>
+                <p className="mb-3">You've created a disease progression sequence.</p>
+                <p className="text-sm italic">Note: There can be multiple valid sequences as disease processes sometimes develop simultaneously.</p>
+              </div>
+            )}
+            
+            <div className="mt-6 flex space-x-4">
+              <button
+                onClick={resetLevel}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={nextLevel}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                {currentLevel.id === levels[levels.length - 1].id 
+                  ? "Next Case" 
+                  : "Next Level"}
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      // Render instructions
+      const renderInstructions = () => {
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl p-6 max-h-screen overflow-auto">
+              <h2 className="text-2xl font-bold mb-4">Welcome to the Pathology Learning Tool</h2>
+              
+              <p className="mb-4">
+                This tool will help you begin to understand how diseases develop and how pathology connects basic science to clinical practice.
+              </p>
+              
+              <h3 className="text-lg font-medium mb-2">How to Use This Tool:</h3>
+              
+              <ol className="list-decimal list-inside space-y-2 mb-4">
+                <li>You'll see a series of medical cases with different findings</li>
+                <li>In the first level, try to identify what type of change each finding represents</li>
+                <li>In the second level, explore how these findings connect to clinical decisions</li>
+                <li>In the third level, arrange the findings in the order they typically occur</li>
+              </ol>
+              
+              <p className="mb-4">
+                Don't worry about getting everything right! This is an introduction to help you
+                start thinking about disease processes. Medical school will teach you all the details.
+              </p>
+              
+              <h3 className="text-lg font-medium mb-2">Types of Changes in Disease:</h3>
+              
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {elementTypes.map(type => (
+                  <div 
+                    key={type.type}
+                    className="p-2 rounded"
+                    style={{ backgroundColor: type.color }}
+                  >
+                    <p className="font-medium">{type.label}</p>
+                    <p className="text-sm">{type.description}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowInstructions(false)}
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Start Learning
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-50">
+          {/* Instructions modal */}
+          {showInstructions && renderInstructions()}
+          
+          {/* Header */}
+          <header className="bg-white border-b border-gray-200 px-4 py-4">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-2xl font-bold text-gray-800">Pathology Learning Tool</h1>
+              <p className="text-gray-600">Understanding disease from changes to clinical presentation</p>
+            </div>
+          </header>
+          
+          {/* Main content */}
+          <main className="max-w-4xl mx-auto py-6 px-4">
+            {/* Case navigation */}
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-semibold">{currentCase.title}</h2>
+                <p className="text-gray-600 text-sm mt-1">Case {currentCase.id} of {cases.length}</p>
+              </div>
+              <div className="flex items-center">
+                <button
+                  onClick={() => setShowInstructions(true)}
+                  className="mr-2 text-blue-500 hover:text-blue-700"
+                >
+                  <HelpCircle size={20} />
+                </button>
+                <button
+                  onClick={nextCase}
+                  className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300"
+                >
+                  Next Case
+                </button>
+              </div>
+            </div>
+            
+            {/* Level navigation */}
+            <div className="flex mb-6 border-b pb-4">
+              {levels.map((level, index) => (
+                <div 
+                  key={level.id}
+                  className={`flex-1 px-2 py-1 text-center cursor-pointer ${
+                    currentLevel.id === level.id 
+                      ? 'border-b-2 border-blue-500 text-blue-800' 
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                  onClick={() => setCurrentLevel(level)}
+                >
+                  <div className="flex items-center justify-center mb-1">
+                    <div className="bg-gray-200 text-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-xs mr-1">
+                      {index + 1}
+                    </div>
+                    <span>{level.name}</span>
+                  </div>
+                  <p className="text-xs hidden sm:block">{level.description}</p>
+                </div>
+              ))}
+            </div>
+            
+            {/* Case description */}
+            <div className="bg-white p-4 mb-6 rounded-lg border border-gray-200">
+              <p>{currentCase.description}</p>
+            </div>
+            
+            {/* Level content */}
+            {currentLevel.id === "identify" && renderIdentifyLevel()}
+            {currentLevel.id === "connect" && renderConnectLevel()}
+            {currentLevel.id === "sequence" && renderSequenceLevel()}
+            
+            {/* Check answers button */}
+            {!showFeedback && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={checkAnswers}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 shadow-sm"
+                >
+                  {currentLevel.id === "connect" ? "Continue" : "Check Answers"}
+                </button>
+              </div>
+            )}
+            
+            {/* Feedback */}
+            {showFeedback && renderFeedback()}
+          </main>
+        </div>
+      );
+    };
+
+    // Render the app
+    ReactDOM.render(
+      <PathologyLearningTool />,
+      document.getElementById('root')
+    );
+  </script>
+</body>
+</html>
