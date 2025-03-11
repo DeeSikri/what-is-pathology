@@ -349,17 +349,17 @@
         <p>Arrange these elements in the order they typically occur in disease development, from earliest to latest.</p>
       </div>
       
-      <div class="sequence-container">
-        <div class="sequence-item type-tissue" data-id="4" onclick="addToSequence(4)">
+      <div class="sequence-container" id="available-elements">
+        <div class="sequence-item type-tissue" data-id="4" onclick="addToSequence(4, this)">
           Invasion of melanoma cells into deeper skin layers
         </div>
-        <div class="sequence-item type-cellular" data-id="2" onclick="addToSequence(2)">
+        <div class="sequence-item type-cellular" data-id="2" onclick="addToSequence(2, this)">
           Abnormal melanocytes multiplying rapidly
         </div>
-        <div class="sequence-item type-physical" data-id="3" onclick="addToSequence(3)">
+        <div class="sequence-item type-physical" data-id="3" onclick="addToSequence(3, this)">
           Irregular border and color changes in the mole
         </div>
-        <div class="sequence-item type-genetic" data-id="1" onclick="addToSequence(1)">
+        <div class="sequence-item type-genetic" data-id="1" onclick="addToSequence(1, this)">
           DNA damage from UV radiation
         </div>
       </div>
@@ -500,52 +500,55 @@
       }
     }
     
-    // Handle sequence creation
-    function addToSequence(id) {
+    // Handle sequence creation - FIXED VERSION
+    function addToSequence(id, clickedElement) {
       // Don't add if already in sequence
       if (sequence.includes(id)) return;
       
       sequence.push(id);
-      updateSequenceDisplay();
       
-      // Hide the item from the available items
-      const item = event.target;
-      item.style.display = 'none';
+      // Hide the clicked element
+      clickedElement.style.display = 'none';
+      
+      // Update the sequence display
+      updateSequenceDisplay();
     }
     
-    // Remove from sequence
+    // Remove from sequence - FIXED VERSION
     function removeFromSequence(id) {
+      // Remove from sequence array
       const index = sequence.indexOf(id);
       if (index !== -1) {
         sequence.splice(index, 1);
       }
-      updateSequenceDisplay();
       
-      // Show the item in available items
-      document.querySelectorAll(`.sequence-item[data-id="${id}"]`).forEach(item => {
+      // Show the original item again
+      const item = document.querySelector(`.sequence-item[data-id="${id}"]`);
+      if (item) {
         item.style.display = 'block';
-      });
+      }
+      
+      // Update the display
+      updateSequenceDisplay();
     }
     
-    // Update sequence display
+    // Update sequence display - FIXED VERSION
     function updateSequenceDisplay() {
       const container = document.getElementById('sequence-order');
-      const emptyMessage = document.getElementById('empty-sequence');
       
       if (sequence.length === 0) {
-        emptyMessage.style.display = 'block';
         container.innerHTML = '<p id="empty-sequence">Click elements above to add them to your sequence</p>';
         return;
       }
-      
-      emptyMessage.style.display = 'none';
       
       // Clear container
       container.innerHTML = '';
       
       // Add each item in sequence
       sequence.forEach((id, index) => {
+        // Find the text content from the original element
         const originalItem = document.querySelector(`.sequence-item[data-id="${id}"]`);
+        const text = originalItem.textContent.trim();
         const className = originalItem.className.replace('sequence-item', 'ordered-item');
         
         const item = document.createElement('div');
@@ -553,7 +556,7 @@
         item.innerHTML = `
           <div style="display: flex; align-items: center;">
             <span class="ordered-num">${index + 1}</span>
-            ${originalItem.textContent}
+            ${text}
           </div>
           <button onclick="removeFromSequence(${id})">Remove</button>
         `;
